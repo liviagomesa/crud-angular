@@ -23,7 +23,7 @@ export class CoursesService {
     return this.httpClient.get<Course[]>(this.API)
     .pipe( // O pipe permite executar funções internas para tratar os dados obtidos com o get
       first(), // para encerrar a inscrição no observable assim que obtiver a primeira resposta
-      delay(5000), // método temporário para atrasar um pouco o retorno do servidor e conseguirmos visualizar o spinner de carregamento
+      delay(2000), // método temporário para atrasar um pouco o retorno do servidor e conseguirmos visualizar o spinner de carregamento
       tap(courses => console.log(courses)) // recebe uma lista de cursos e imprime no console, mas poderia fazer uma manipulação nesses dados
     );
   }

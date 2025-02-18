@@ -10,7 +10,7 @@ export class CoursesService {
 
   // variável que guarda a URL do servidor que será requisitada. Enquanto não fazemos o servidor,
   // fizemos um arquivo json temporário representativo
-  private readonly API = '/assets/courses.json';
+  private readonly API = 'api/courses';
 
   // o httpClient é fornecido automaticamente para nós, pois a classe HttpClient (ver documentação do Angular)
   // também foi criada com @Injectable (injeção de dependências). Porém também é necessário importar o

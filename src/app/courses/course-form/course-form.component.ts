@@ -1,7 +1,7 @@
 import { Location } from '@angular/common';
 import { CoursesService } from './../services/courses.service';
 import { Component, OnInit } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
+import { NonNullableFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
@@ -12,18 +12,17 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 export class CourseFormComponent implements OnInit {
 
   // Propriedades da classe do componente
-  courseForm: UntypedFormGroup;
+  courseForm = this.formBuilder.group({
+    name: [''], // já tipamos os campos do formulário aqui
+    category: ['']
+  });
 
   constructor(
-    private formBuilder: UntypedFormBuilder,
+    private formBuilder: NonNullableFormBuilder, // esta classe informa que os campos não podem ser nulos, mas poderíamos usar também apenas FormBuilder
     private service: CoursesService,
     private snackBar: MatSnackBar,
     private location: Location
   ) {
-    this.courseForm = this.formBuilder.group({
-      name: [null],
-      category: [null]
-    });
   }
 
   ngOnInit(): void {

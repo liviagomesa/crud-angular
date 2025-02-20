@@ -27,4 +27,8 @@ export class CoursesService {
       tap(courses => console.log(courses)) // recebe uma lista de cursos e imprime no console, mas poderia fazer uma manipulação nesses dados
     );
   }
+
+  save(record: Course) {
+    return this.httpClient.post<Course>(this.API, record).pipe(first());
+  }
 }

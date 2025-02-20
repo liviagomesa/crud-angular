@@ -1,3 +1,4 @@
+import { Location } from '@angular/common';
 import { CoursesService } from './../services/courses.service';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
@@ -13,7 +14,12 @@ export class CourseFormComponent implements OnInit {
   // Propriedades da classe do componente
   courseForm: FormGroup;
 
-  constructor(private formBuilder: FormBuilder, private service: CoursesService, private snackBar: MatSnackBar) {
+  constructor(
+    private formBuilder: FormBuilder,
+    private service: CoursesService,
+    private snackBar: MatSnackBar,
+    private location: Location
+  ) {
     this.courseForm = this.formBuilder.group({
       name: [null],
       category: [null]
@@ -26,15 +32,20 @@ export class CourseFormComponent implements OnInit {
   onSubmit() {
     // o método value retorna um json com todos os campos e valores preenchidos no formulário
     // como save retorna um observable, é necessário se inscrever nele (subscribe)
-    this.service.save(this.courseForm.value).subscribe(result => console.log(result), error => this.onError());
+    this.service.save(this.courseForm.value).subscribe(result => this.onSuccess(), error => this.onError());
   }
 
   onCancel() {
-
+    this.location.back();
   }
 
   private onError() {
     this.snackBar.open('Erro ao salvar curso', '', {duration: 5000});
+  }
+
+  private onSuccess() {
+    this.snackBar.open('Curso salvo com sucesso', '', {duration: 5000});
+    this.location.back();
   }
 
 }

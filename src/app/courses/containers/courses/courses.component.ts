@@ -51,4 +51,8 @@ export class CoursesComponent implements OnInit {
     this.router.navigate(['new'], {relativeTo: this.currentRoute}) // Ao clicar no botão, o Angular vai pegar a rota atual (/courses) e agregar /new.
   }
 
+  onEdit(course: Course) {
+    this.router.navigate(['edit', course._id], {relativeTo: this.currentRoute})
+  }
+
 }

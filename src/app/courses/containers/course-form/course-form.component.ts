@@ -1,8 +1,10 @@
+import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 import { CoursesService } from '../../services/courses.service';
 import { Component, OnInit } from '@angular/core';
-import { NonNullableFormBuilder, UntypedFormGroup } from '@angular/forms';
+import { NonNullableFormBuilder } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { Course } from '../../model/course';
 
 @Component({
   selector: 'app-course-form',
@@ -13,6 +15,7 @@ export class CourseFormComponent implements OnInit {
 
   // Propriedades da classe do componente
   courseForm = this.formBuilder.group({
+    _id: [''],
     name: [''], // já tipamos os campos do formulário aqui
     category: ['']
   });
@@ -21,11 +24,14 @@ export class CourseFormComponent implements OnInit {
     private formBuilder: NonNullableFormBuilder, // esta classe informa que os campos não podem ser nulos, mas poderíamos usar também apenas FormBuilder
     private service: CoursesService,
     private snackBar: MatSnackBar,
-    private location: Location
+    private location: Location,
+    private currentRoute: ActivatedRoute
   ) {
   }
 
   ngOnInit(): void {
+    const course: Course = this.currentRoute.snapshot.data['course']; // acessamos o curso retornado pelo resolver
+    this.courseForm.setValue({_id: course._id, name: course.name, category: course.category}); // ajustando os valores do formulário conforme curso do resolver
   }
 
   onSubmit() {

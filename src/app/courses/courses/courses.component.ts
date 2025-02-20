@@ -18,7 +18,7 @@ export class CoursesComponent implements OnInit {
 
   courses$: Observable<Course[]>; // Aqui só fica uma lista em branco, pois quem gera e passa para o
   // componente a lista é o serviço ($ ao final como boa prática para informar que é um observable)
-  displayedColumns: string[] = ['name', 'category', 'actions'];
+
 
   // Estamos passando o CoursesService via construtor para que seja injetado automaticamente
   // (classes de serviço são sempre marcadas como @Injectable pelo Angular)

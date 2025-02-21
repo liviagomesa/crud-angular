@@ -6,6 +6,7 @@ import { catchError } from 'rxjs/operators';
 import { MatDialog } from '@angular/material/dialog';
 import { ErrorDialogComponent } from 'src/app/shared/components/error-dialog/error-dialog.component';
 import { ActivatedRoute, Router } from '@angular/router';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-courses',
@@ -16,7 +17,7 @@ export class CoursesComponent implements OnInit {
 
   // Propriedades da classe (serão usadas no html)
 
-  courses$: Observable<Course[]>; // Aqui só fica uma lista em branco, pois quem gera e passa para o
+  courses$: Observable<Course[]> | null = null; // Aqui só fica nulo, pois quem gera e passa para o
   // componente a lista é o serviço ($ ao final como boa prática para informar que é um observable)
 
 
@@ -26,8 +27,13 @@ export class CoursesComponent implements OnInit {
     private coursesService: CoursesService,
     public dialog: MatDialog,
     private router: Router,
-    private currentRoute: ActivatedRoute
+    private currentRoute: ActivatedRoute,
+    private snackBar: MatSnackBar,
   ) {
+    this.refresh();
+  }
+
+  refresh() {
     this.courses$ = this.coursesService.list()
     .pipe(
       catchError(error => { // em caso de erro no método
@@ -54,5 +60,20 @@ export class CoursesComponent implements OnInit {
   onEdit(course: Course) {
     this.router.navigate(['edit', course._id], {relativeTo: this.currentRoute})
   }
+
+  onDelete(course: Course) {
+    this.coursesService.delete(course._id).subscribe(() => { // necessário se inscrever no observable para o método funcionar
+      this.refresh();
+      this.snackBar.open('Curso removido com sucesso', 'X', { // o X é a action (fechar)
+        duration: 5000,
+        verticalPosition: 'top',
+        horizontalPosition: 'center'
+      });
+    },
+    () => this.onError("Erro ao tentar remover curso")
+  );
+  }
+
+
 
 }

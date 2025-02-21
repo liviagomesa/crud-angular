@@ -9,7 +9,7 @@
    Os dados emitidos são armazenados na variável courses.
    Se não retornar dados (ou demorar), será mostrado o template loading; caso contrário, mostra-se esta div -->
     <app-courses-list *ngIf="courses$ | async as courses; else loading" [courses]="courses" (add)="onAdd()"
-      (edit)="onEdit($event)"></app-courses-list>
+      (edit)="onEdit($event)" (delete)="onDelete($event)"></app-courses-list>
     <!-- aqui escutamos o evento add do componente filho e executamos a função onAdd() deste componente pai -->
 
     <!-- Criando o template loading -->

@@ -24,15 +24,26 @@ export class CoursesService {
     .pipe( // O pipe permite executar funções internas para tratar os dados obtidos com o get
       first(), // para encerrar a inscrição no observable assim que obtiver a primeira resposta
       // delay(2000), // método temporário para atrasar um pouco o retorno do servidor e conseguirmos visualizar o spinner de carregamento
-      tap(courses => console.log(courses)) // recebe uma lista de cursos e imprime no console, mas poderia fazer uma manipulação nesses dados
+      // tap(courses => console.log(courses)) // recebe uma lista de cursos e imprime no console, mas poderia fazer uma manipulação nesses dados
     );
   }
 
   save(record: Partial<Course>) {
-    return this.httpClient.post<Course>(this.API, record).pipe(first());
+    if (record._id) {
+      return this.update(record);
+    }
+    return this.create(record);
   }
 
   loadById(id: string) {
     return this.httpClient.get<Course>(`${this.API}/${id}`);
+  }
+
+  private create(record: Partial<Course>) {
+    return this.httpClient.post<Course>(this.API, record).pipe(first());
+  }
+
+  private update(record: Partial<Course>) {
+    return this.httpClient.put<Course>(`${this.API}/${record._id}`, record).pipe(first());
   }
 }

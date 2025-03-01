@@ -63,6 +63,10 @@ export class CoursesComponent implements OnInit {
   }
 
   onDelete(course: Course) {
+    // O método open() do MatDialog recebe dois argumentos: a classe do componente do dialog e um objeto de
+    // configuração, que aceita diversas propriedades, como width, height, disableClose (impede que o
+    // usuário feche o dialog clicando fora dele) e data (um objeto qualquer que deseja passar para o
+    // componente do dialog e do tipo informado no construtor do componente do dialog (no nosso, caso, string))
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
       data: 'Tem certeza de que deseja excluir?',
     });
@@ -72,7 +76,7 @@ export class CoursesComponent implements OnInit {
         this.coursesService.delete(course._id).subscribe({
           next: () => { // necessário se inscrever no observable para o método funcionar
             this.refresh();
-            this.snackBar.open('Curso removido com sucesso', 'X', { // o X é a action (fechar)
+            this.snackBar.open('Curso removido com sucesso', 'X', { // o X é a action (sempre será fechar, poderia escrever outra coisa, como "close", "fechar", etc.)
               duration: 5000,
               verticalPosition: 'top',
               horizontalPosition: 'center'

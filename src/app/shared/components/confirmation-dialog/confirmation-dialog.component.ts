@@ -10,11 +10,11 @@ export class ConfirmationDialogComponent implements OnInit {
 
   constructor(
     public dialogRef: MatDialogRef<ConfirmationDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: string,
+    @Inject(MAT_DIALOG_DATA) public data: string, // agora, this.data pode ser acessado diretamente no template
   ) {}
 
   onConfirm(result: boolean): void {
-    this.dialogRef.close(result);
+    this.dialogRef.close(result); // Quando um diálogo é fechado, ele emite um observable que encapsula result e acessível com subscribe pelo método afterClosed()
   }
 
   ngOnInit(): void {

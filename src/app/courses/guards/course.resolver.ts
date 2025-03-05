@@ -20,6 +20,6 @@ export class CourseResolver implements Resolve<Course> { // Esta interface exige
       return this.service.loadById(route.params['id']);
     }
     // caso seja a rota de criação de curso, isto é, não tem parâmetro id
-    return of({_id: '', name: '', category: ''});
+    return of({_id: '', name: '', category: '', lessons: []});
   }
 }

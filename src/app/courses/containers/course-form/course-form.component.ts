@@ -2,9 +2,10 @@ import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 import { CoursesService } from '../../services/courses.service';
 import { Component, OnInit } from '@angular/core';
-import { NonNullableFormBuilder, Validators } from '@angular/forms';
+import { FormGroup, NonNullableFormBuilder, UntypedFormArray, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Course } from '../../model/course';
+import { Lesson } from '../../model/lesson';
 
 @Component({
   selector: 'app-course-form',
@@ -14,13 +15,7 @@ import { Course } from '../../model/course';
 export class CourseFormComponent implements OnInit {
 
   // Propriedades da classe do componente
-  courseForm = this.formBuilder.group({
-    _id: [''],
-    name: ['', [Validators.required,
-      Validators.minLength(5),
-      Validators.maxLength(50)]], // já tipamos os campos do formulário aqui
-    category: ['', [Validators.required]]
-  });
+  courseForm!: FormGroup;
 
   constructor(
     private formBuilder: NonNullableFormBuilder, // esta classe informa que os campos não podem ser nulos, mas poderíamos usar também apenas FormBuilder
@@ -33,7 +28,38 @@ export class CourseFormComponent implements OnInit {
 
   ngOnInit(): void {
     const course: Course = this.currentRoute.snapshot.data['course']; // acessamos o curso retornado pelo resolver
-    this.courseForm.setValue({_id: course._id, name: course.name, category: course.category}); // ajustando os valores do formulário conforme curso do resolver
+    this.courseForm = this.formBuilder.group({
+      _id: [course._id],
+      name: [course.name, [Validators.required,
+        Validators.minLength(5),
+        Validators.maxLength(50)]], // já tipamos os campos do formulário aqui
+      category: [course.category, [Validators.required]],
+      lessons: this.formBuilder.array(this.retrieveLessons(course))
+    });
+  }
+
+  // O cadastro de cada lição é como um "mini formulário" na página, abaixo dos demais campos do curso
+  private createLesson(lesson: Lesson = {id: '', name: '', youtubeUrl: ''}) {
+    return this.formBuilder.group({
+      id: [lesson.id],
+      name: [lesson.name],
+      youtubeUrl: [lesson.youtubeUrl]
+    });
+  }
+
+  private retrieveLessons(course: Course) {
+    const lessons = [];
+    if (course?.lessons) {
+      course.lessons.forEach(l => lessons.push(this.createLesson(l)));
+    }
+    else {
+      lessons.push(this.createLesson());
+    }
+    return lessons;
+  }
+
+  getLessonsFormArray() {
+    return (<UntypedFormArray>this.courseForm.get('lessons')).controls;
   }
 
   onSubmit() {
@@ -62,8 +88,9 @@ export class CourseFormComponent implements OnInit {
       return 'Campo obrigatório';
     }
 
+    // obrigatório letra minúscula
     if (field?.hasError('minlength')) {
-      const requiredLength: number = field.errors ? field.errors['minlength']['requiredLength'] : 5;
+      const requiredLength: number = field.errors ? field.errors['minlength']['requiredLength'] : 5; // obrigatório letra minúscula minlength
       return `Tamanho mínimo deve ser de ${requiredLength} caracteres.`;
     }
 

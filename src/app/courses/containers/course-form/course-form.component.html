@@ -17,11 +17,37 @@
         <mat-label>Categoria</mat-label>
         <mat-select formControlName="category">
           <mat-option value="null"></mat-option>
-          <mat-option value="front-end">Front-end</mat-option>
-          <mat-option value="back-end">Back-end</mat-option>
+          <mat-option value="Front-end">Front-end</mat-option>
+          <mat-option value="Back-end">Back-end</mat-option>
         </mat-select>
         <mat-error *ngIf="courseForm.get('category')?.invalid">{{getErrorMessage('category')}}</mat-error>
       </mat-form-field>
+
+      <mat-toolbar>
+        <span>Aulas</span>
+        <button mat-icon-button color="accent"><mat-icon aria-label="Adicionar uma nova aula">add</mat-icon></button>
+      </mat-toolbar>
+
+      <!-- Obtendo o form array lessons do arquivo TS e iterando sobre ele -->
+      <table style="width: 100%;" formArrayName="lessons" *ngFor="let lesson of getLessonsFormArray(); let i = index">
+        <tr [formGroupName]="i">
+          <!-- Coluna 1 - nome da aula -->
+          <td style="width: 65%;">
+            <mat-form-field class="full-width">
+              <mat-label>Nome da aula</mat-label>
+              <input matInput formControlName="name">
+            </mat-form-field>
+          </td>
+          <!-- Coluna 2 - URL YouTube -->
+          <td style="width: 30%;">
+            <mat-form-field class="full-width">
+              <mat-label>URL</mat-label>
+              <span matPrefix>https://youtu.be/</span>
+              <input matInput formControlName="youtubeUrl">
+            </mat-form-field>
+          </td>
+        </tr>
+      </table>
 
     </form>
   </mat-card-content>

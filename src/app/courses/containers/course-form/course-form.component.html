@@ -9,7 +9,7 @@
       <mat-form-field class="full-width">
         <!-- o atributo formControlName associa este input ao campo name do courseForm -->
         <input matInput placeholder="Nome" formControlName="name" #name>
-        <mat-hint align="end">{{name.value?.length || 0}}/50</mat-hint>
+        <mat-hint align="end">{{name.value.length || 0}}/50</mat-hint>
         <mat-error *ngIf="courseForm.get('name')?.invalid">{{getErrorMessage('name')}}</mat-error>
       </mat-form-field>
 
@@ -25,11 +25,14 @@
 
       <mat-toolbar>
         <span>Aulas</span>
-        <button mat-icon-button color="accent"><mat-icon aria-label="Adicionar uma nova aula">add</mat-icon></button>
+        <button mat-icon-button color="accent" (click)="addNewLesson()"><mat-icon
+            aria-label="Adicionar uma nova aula">add</mat-icon></button>
       </mat-toolbar>
 
-      <!-- Obtendo o form array lessons do arquivo TS e iterando sobre ele -->
+      <!-- A propriedade lessons não está declarada diretamente na classe, mas ela existe dentro do courseForm, que foi referenciado na linha pai (form), por isso, o Angular entende que estamos referenciando essa propriedade dentro do formulário
+      O ngFor itera sobre o array de aulas e cria dinamicamente uma linha (<tr>). O index é uma variável especial do *ngFor, que representa a posição atual do item dentro do array. -->
       <table style="width: 100%;" formArrayName="lessons" *ngFor="let lesson of getLessonsFormArray(); let i = index">
+        <!-- A diretiva [formGroupName] é usada SOMENTE dentro de um FormArray para indicar que cada <tr> será um FormGroup separado dentro do FormArray. -->
         <tr [formGroupName]="i">
           <!-- Coluna 1 - nome da aula -->
           <td style="width: 65%;">
@@ -45,6 +48,11 @@
               <span matPrefix>https://youtu.be/</span>
               <input matInput formControlName="youtubeUrl">
             </mat-form-field>
+          </td>
+          <!-- Coluna 3 - Lixeira -->
+          <td>
+            <button mat-icon-button color="warn" (click)="removeLesson(i)"><mat-icon
+                aria-label="Remover aula">delete</mat-icon></button>
           </td>
         </tr>
       </table>

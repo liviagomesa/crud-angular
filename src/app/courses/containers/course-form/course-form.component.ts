@@ -34,7 +34,7 @@ export class CourseFormComponent implements OnInit {
         Validators.minLength(5),
         Validators.maxLength(50)]], // já tipamos os campos do formulário aqui
       category: [course.category, [Validators.required]],
-      lessons: this.formBuilder.array(this.retrieveLessons(course))
+      lessons: this.formBuilder.array(this.retrieveLessons(course)) // Um FormArray composto de FormGroups
     });
   }
 
@@ -55,11 +55,24 @@ export class CourseFormComponent implements OnInit {
     else {
       lessons.push(this.createLesson());
     }
-    return lessons;
+    return lessons; // Retorna um FormGroup
   }
 
+  // Retorna uma lista de AbstractControl (elementos do FormArray) (podem ser convertidos para FormGroup)
   getLessonsFormArray() {
     return (<UntypedFormArray>this.courseForm.get('lessons')).controls;
+  }
+
+  addNewLesson() {
+    // O método get() do FormGroup retorna um AbstractControl | null, então há erro se tentarmos usar .push().
+    // Para resolver, convertemos para UntypedFormArray.
+    const lessons = this.courseForm.get('lessons') as UntypedFormArray;
+    lessons.push(this.createLesson());
+  }
+
+  removeLesson(index: number) {
+    const lessons = this.courseForm.get('lessons') as UntypedFormArray;
+    lessons.removeAt(index);
   }
 
   onSubmit() {

@@ -10,17 +10,17 @@
         <!-- o atributo formControlName associa este input ao campo name do courseForm -->
         <input matInput placeholder="Nome" formControlName="name" #name>
         <mat-hint align="end">{{name.value.length || 0}}/50</mat-hint>
-        <mat-error *ngIf="courseForm.get('name')?.invalid">{{getErrorMessage('name')}}</mat-error>
+        <mat-error *ngIf="courseForm.get('name')?.invalid">{{formUtils.getErrorMessage(courseForm, 'name')}}</mat-error>
       </mat-form-field>
 
       <mat-form-field class="full-width">
         <mat-label>Categoria</mat-label>
         <mat-select formControlName="category">
-          <mat-option value="null"></mat-option>
           <mat-option value="Front-end">Front-end</mat-option>
           <mat-option value="Back-end">Back-end</mat-option>
         </mat-select>
-        <mat-error *ngIf="courseForm.get('category')?.invalid">{{getErrorMessage('category')}}</mat-error>
+        <mat-error *ngIf="courseForm.get('category')?.invalid">{{formUtils.getErrorMessage(courseForm,
+          'category')}}</mat-error>
       </mat-form-field>
 
       <mat-toolbar>
@@ -28,6 +28,9 @@
         <button mat-icon-button color="accent" (click)="addNewLesson()"><mat-icon
             aria-label="Adicionar uma nova aula">add</mat-icon></button>
       </mat-toolbar>
+
+      <mat-error *ngIf="formUtils.isFormArrayRequiredAndTouched(courseForm, 'lessons')">Adicione pelo menos uma
+        aula</mat-error>
 
       <!-- A propriedade lessons não está declarada diretamente na classe, mas ela existe dentro do courseForm, que foi referenciado na linha pai (form), por isso, o Angular entende que estamos referenciando essa propriedade dentro do formulário
       O ngFor itera sobre o array de aulas e cria dinamicamente uma linha (<tr>). O index é uma variável especial do *ngFor, que representa a posição atual do item dentro do array. -->
@@ -39,6 +42,9 @@
             <mat-form-field class="full-width">
               <mat-label>Nome da aula</mat-label>
               <input matInput formControlName="name">
+              <mat-error *ngIf="getLessonsFormArray()[i].get('name')?.invalid">
+                {{ formUtils.getFormArrayFieldErrorMessage(courseForm, 'lessons', 'name', i) }}
+              </mat-error>
             </mat-form-field>
           </td>
           <!-- Coluna 2 - URL YouTube -->
@@ -47,6 +53,9 @@
               <mat-label>URL</mat-label>
               <span matPrefix>https://youtu.be/</span>
               <input matInput formControlName="youtubeUrl">
+              <mat-error *ngIf="getLessonsFormArray()[i].get('youtubeUrl')?.invalid">
+                {{ formUtils.getFormArrayFieldErrorMessage(courseForm, 'lessons', 'youtubeUrl', i) }}
+              </mat-error>
             </mat-form-field>
           </td>
           <!-- Coluna 3 - Lixeira -->

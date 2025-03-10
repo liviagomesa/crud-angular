@@ -1,3 +1,4 @@
+import { FormUtilsService } from './../../../shared/form/form-utils.service';
 import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 import { CoursesService } from '../../services/courses.service';
@@ -22,7 +23,8 @@ export class CourseFormComponent implements OnInit {
     private service: CoursesService,
     private snackBar: MatSnackBar,
     private location: Location,
-    private currentRoute: ActivatedRoute
+    private currentRoute: ActivatedRoute,
+    public formUtils: FormUtilsService // Publico para conseguirmos acessar no html
   ) {
   }
 
@@ -34,7 +36,7 @@ export class CourseFormComponent implements OnInit {
         Validators.minLength(5),
         Validators.maxLength(50)]], // já tipamos os campos do formulário aqui
       category: [course.category, [Validators.required]],
-      lessons: this.formBuilder.array(this.retrieveLessons(course)) // Um FormArray composto de FormGroups
+      lessons: this.formBuilder.array(this.retrieveLessons(course), Validators.required) // Um FormArray composto de FormGroups
     });
   }
 
@@ -42,8 +44,12 @@ export class CourseFormComponent implements OnInit {
   private createLesson(lesson: Lesson = {id: '', name: '', youtubeUrl: ''}) {
     return this.formBuilder.group({
       id: [lesson.id],
-      name: [lesson.name],
-      youtubeUrl: [lesson.youtubeUrl]
+      name: [lesson.name, [Validators.required,
+        Validators.minLength(5),
+        Validators.maxLength(50)]],
+      youtubeUrl: [lesson.youtubeUrl, [Validators.required,
+        Validators.minLength(10),
+        Validators.maxLength(11)]]
     });
   }
 
@@ -76,9 +82,13 @@ export class CourseFormComponent implements OnInit {
   }
 
   onSubmit() {
-    // o método value retorna um json com todos os campos e valores preenchidos no formulário
-    // como save retorna um observable, é necessário se inscrever nele (subscribe)
-    this.service.save(this.courseForm.value).subscribe(result => this.onSuccess(), error => this.onError());
+    if (this.courseForm.valid) {
+      // o método value retorna um json com todos os campos e valores preenchidos no formulário
+      // como save retorna um observable, é necessário se inscrever nele (subscribe)
+      this.service.save(this.courseForm.value).subscribe(result => this.onSuccess(), error => this.onError());
+    } else {
+      this.formUtils.validateAllFormFields(this.courseForm);
+    }
   }
 
   onCancel() {
@@ -92,27 +102,6 @@ export class CourseFormComponent implements OnInit {
   private onSuccess() {
     this.snackBar.open('Curso salvo com sucesso', '', {duration: 5000});
     this.location.back();
-  }
-
-  public getErrorMessage(fieldName: string) {
-    const field = this.courseForm.get(fieldName);
-    // a interrogação abstrai a checagem if field != null && (que precisa ser feita senão dá erro)
-    if (field?.hasError('required')) {
-      return 'Campo obrigatório';
-    }
-
-    // obrigatório letra minúscula
-    if (field?.hasError('minlength')) {
-      const requiredLength: number = field.errors ? field.errors['minlength']['requiredLength'] : 5; // obrigatório letra minúscula minlength
-      return `Tamanho mínimo deve ser de ${requiredLength} caracteres.`;
-    }
-
-    if (field?.hasError('maxlength')) {
-      const requiredLength: number = field.errors ? field.errors['maxlength']['requiredLength'] : 50;
-      return `Tamanho máximo deve ser de ${requiredLength} caracteres.`;
-    }
-
-    return 'Campo inválido';
   }
 
 }

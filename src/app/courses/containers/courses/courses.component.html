@@ -4,20 +4,32 @@
     <span>Cursos disponíveis</span>
   </mat-toolbar>
 
-  <div class="mat-elevation-z8 column-flex">
+  <div class="mat-elevation-z8 column-flex" *ngIf="courses$ | async as courses; else loading">
     <!-- O async pipe (nativo) atualiza o template sempre que o Observable emite um novo valor.
    Os dados emitidos são armazenados na variável courses.
    Se não retornar dados (ou demorar), será mostrado o template loading; caso contrário, mostra-se esta div -->
-    <app-courses-list *ngIf="courses$ | async as courses; else loading" [courses]="courses" (add)="onAdd()"
-      (edit)="onEdit($event)" (delete)="onDelete($event)"></app-courses-list>
+    <app-courses-list [courses]="courses.courses" (add)="onAdd()" (edit)="onEdit($event)"
+      (delete)="onDelete($event)"></app-courses-list>
     <!-- aqui escutamos o evento add do componente filho e executamos a função onAdd() deste componente pai -->
 
-    <!-- Criando o template loading -->
-    <ng-template #loading>
-      <div class="loading-spinner">
-        <mat-spinner></mat-spinner>
-      </div>
-    </ng-template>
+    <!-- mat-paginator renderiza uma "faixa" ao fim da tabela com informações e botões de paginação.
+    Formato: "Items per page: [pageSize] | X - Y (infos pageIndex) of [length] | (btn next pg) (btn last pg)"
+    Ver atributos que podemos usar no seletor mat-paginator do componente MatPaginator: https://v14.material.angular.io/components/paginator/api
+    pageIndex é o índice da página atual, iniciando em zero
+    pageSize é o número de itens por página
+    length é o total de itens a serem mostrados
+    page é o evento emitido quando o usuário muda o tamanho da página ou o índice (lança um EventEmitter<PageEvent>) -->
+    <mat-paginator [pageSizeOptions]="[5, 10, 15]" showFirstLastButtons [pageIndex]="pageIndex" [pageSize]="pageSize"
+      [length]="courses.totalElements" (page)="refresh($event)" aria-label="Select page of courses">
+    </mat-paginator>
+
   </div>
+
+  <!-- Criando o template loading -->
+  <ng-template #loading>
+    <div class="loading-spinner">
+      <mat-spinner></mat-spinner>
+    </div>
+  </ng-template>
 
 </mat-card>

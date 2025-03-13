@@ -1,13 +1,15 @@
 import { Observable, of } from 'rxjs';
 import { CoursesService } from '../../services/courses.service';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Course } from '../../model/course';
-import { catchError } from 'rxjs/operators';
+import { catchError, tap } from 'rxjs/operators';
 import { MatDialog } from '@angular/material/dialog';
 import { ErrorDialogComponent } from 'src/app/shared/components/error-dialog/error-dialog.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ConfirmationDialogComponent } from 'src/app/shared/components/confirmation-dialog/confirmation-dialog.component';
+import { CoursePage } from '../../model/course-page';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-courses',
@@ -18,9 +20,14 @@ export class CoursesComponent implements OnInit {
 
   // Propriedades da classe (serão usadas no html)
 
-  courses$: Observable<Course[]> | null = null; // Aqui só fica nulo, pois quem gera e passa para o
+  courses$: Observable<CoursePage> | null = null; // Aqui só fica nulo, pois quem gera e passa para o
   // componente a lista é o serviço ($ ao final como boa prática para informar que é um observable)
 
+  // Captura a instância do componente MatPaginator que está no HTML, ou seja, o <mat-paginator>. O seletor do componente (mat-paginator) representa uma instância da classe MatPaginator.
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+
+  pageIndex = 0;
+  pageSize = 5;
 
   // Estamos passando o CoursesService via construtor para que seja injetado automaticamente
   // (classes de serviço são sempre marcadas como @Injectable pelo Angular)
@@ -34,12 +41,18 @@ export class CoursesComponent implements OnInit {
     this.refresh();
   }
 
-  refresh() {
-    this.courses$ = this.coursesService.list()
+  // PageEvent é uma classe do Paginator que tem como propriedades: pageIndex (passamos 0), pageSize (passamos 5) e length (obtido no próprio HTML a partir do retorno do método do serviço, que consulta a API)
+  // Demos valores padrões para que o refresh do construtor não precise de argumentos (o paginator inicializará com esses valores); o length será alterado no próprio HTML com o retorno da API antes da renderização
+  refresh(pageEvent: PageEvent = { length: 0, pageIndex: 0, pageSize: 5 }) {
+    this.courses$ = this.coursesService.list(pageEvent.pageIndex, pageEvent.pageSize)
     .pipe(
+      tap(() => {
+        this.pageIndex = pageEvent.pageIndex;
+        this.pageSize = pageEvent.pageSize;
+      }),
       catchError(error => { // em caso de erro no método
         this.onError('Erro ao carregar cursos.');
-        return of([]); // retornar um observable que retorna um array vazio
+        return of({courses: [], totalElements: 0, totalPages: 0}); // retornar um observable que retorna um array vazio
       })
     );
   }

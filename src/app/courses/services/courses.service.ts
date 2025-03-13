@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Course } from '../model/course';
 import { HttpClient } from '@angular/common/http';
 import { delay, first, tap } from 'rxjs/operators';
+import { CoursePage } from '../model/course-page';
 
 @Injectable({
   providedIn: 'root' // Indica que essa classe é injetável e está disponível no root (ou seja, em toda a aplicação)
@@ -19,8 +20,8 @@ export class CoursesService {
   constructor(private httpClient: HttpClient) { }
 
   // Método para exportar a lista de cursos para o componente
-  list() {
-    return this.httpClient.get<Course[]>(this.API)
+  list(page = 0, pageSize = 5) {
+    return this.httpClient.get<CoursePage>(this.API, { params: { page: page, pageSize: pageSize } })
     .pipe( // O pipe permite executar funções internas para tratar os dados obtidos com o get
       first(), // para encerrar a inscrição no observable assim que obtiver a primeira resposta
       // delay(2000), // método temporário para atrasar um pouco o retorno do servidor e conseguirmos visualizar o spinner de carregamento
